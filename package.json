@@ -1,0 +1,29 @@
+{
+  "name": "tic-tac-toe",
+  "version": "1.0.0",
+  "description": "Simple Tic-tac-toe game by canvas",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Coder801/tic-tac-toe.git"
+  },
+  "keywords": [
+    "tic-tac-toe",
+    "game",
+    "canvas",
+    "webpack"
+  ],
+  "author": "donischenko801@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Coder801/tic-tac-toe/issues"
+  },
+  "homepage": "https://github.com/Coder801/tic-tac-toe#readme",
+  "devDependencies": {
+    "webpack": "^4.1.1",
+    "webpack-dev-server": "^3.1.1"
+  }
+}

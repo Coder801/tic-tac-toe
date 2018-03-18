@@ -8,6 +8,16 @@ class TicTacToe {
     this.fraction = options.size / options.cells;
     this.fractions = [];
     this.player = 1;
+    this.winCombinations = [
+      [1, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 1],
+      [1, 0, 0, 1, 0, 0, 1, 0, 0],
+      [0, 1, 0, 0, 1, 0, 0, 1, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      [0, 0, 1, 0, 1, 0, 1, 0, 0],
+    ]
   }
 
   setBoardSize(board, size) {
@@ -20,11 +30,11 @@ class TicTacToe {
     @param number
     @param number
   */
-  setFractions(size, cells) { // FIXME: fix fraction propperty
+  setFractions(size, cells, fraction) {
     for(let i = 0; i < cells; i++) {
-      let posY = this.fraction * i;
+      let posY = fraction * i;
       for(let j = 0; j < cells; j++) {
-        let posX = this.fraction * j;
+        let posX = fraction * j;
         this.fractions.push({
           state: false,
           posX,
@@ -38,7 +48,6 @@ class TicTacToe {
     const centerY = (posY + size) - (size / 2);
     context.beginPath();
     context.lineWidth = 10;
-    context.lineCap = 'round';
     context.strokeStyle = '#ff0000';
     context.arc(centerX, centerY, 40, 0, 2 * Math.PI);
     context.stroke();
@@ -69,8 +78,37 @@ class TicTacToe {
   }
 
   checkResults(fractions) {
-    console.log(fractions)
-    return false
+
+    const filterTic = fractions.map(function(item) {
+      let state = 0;
+      if(item.state == 'tic') {
+        state == 1
+      }
+      return state;
+    });
+
+    const filterTac = fractions.map(function(item) {
+      let state = 0;
+      if(item.state == 'tac') {
+        state == 1
+      }
+      return state;
+    });
+
+    const compareArrays = function(arrayOne, arrayTwo) {
+      if(arrayOne.length === arrayTwo.length) {
+        for(let i = 0; i < arrayOne.length; i++) {
+          if(arrayOne[i] !== arrayTwo[i]) {
+            return false;
+          }
+        };
+      }
+      return false;
+    }
+
+    this.winCombinations.forEach(function(item) {
+      compareArrays(filterTic, item)
+    });
   }
 
   clickEvent(board, fractions, fraction) {
@@ -84,7 +122,7 @@ class TicTacToe {
             break;
           }
           this.player = !this.player;
-          if(this.player) {
+          if(!this.player) {
             this.drawCross(this.context, item.posX, item.posY, this.fraction)
             item.state = 'tic';
           } else {
@@ -101,7 +139,7 @@ class TicTacToe {
 
   init() {
     this.setBoardSize(this.board, this.size);
-    this.setFractions(this.size, this.cells);
+    this.setFractions(this.size, this.cells, this.fraction);
     this.drawFractions(this.context, this.fractions, this.size, this.cells);
     this.clickEvent(this.board, this.fractions, this.fraction);
   }
