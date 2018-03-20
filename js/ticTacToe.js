@@ -8,6 +8,7 @@ class TicTacToe {
     this.fraction = options.size / options.cells;
     this.fractions = [];
     this.player = 1;
+    this.win = false;
     this.winCombinations = [
       [1, 1, 1, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 1, 1, 1, 0, 0, 0],
@@ -43,6 +44,17 @@ class TicTacToe {
       }
     }
   }
+
+  drawLine(context, cordinats, size) {
+    context.beginPath();
+    context.moveTo(cordinats.startX, cordinats.startY);
+    context.lineTo(cordinats.finishX, cordinats.finishY);
+    context.lineWidth = 10;
+    context.lineCap = 'round';
+    context.strokeStyle = '#ff0000';
+    context.stroke();
+  }
+
   drawCircle(context, posX, posY, size) {
     const centerX = (posX + size) - (size / 2);
     const centerY = (posY + size) - (size / 2);
@@ -54,15 +66,16 @@ class TicTacToe {
   }
 
   drawCross(context, posX, posY, size) {
-    context.beginPath();
-    context.moveTo(posX + 20, posY + 20);
-    context.lineTo(posX + size - 20, posY + size - 20);
-    context.moveTo(posX + size - 20, posY + 20);
-    context.lineTo(posX + 20, posY + size - 20);
-    context.lineWidth = 10;
-    context.lineCap = 'round';
-    context.strokeStyle = '#ff0000';
-    context.stroke();
+
+    const cordinats = {
+      startX: posX + 20,
+      startY: posY + 20,
+      finishX: posX + size - 20,
+      finishY: posY + size - 20
+    }
+
+    this.drawLine(context, cordinats);
+    this.drawLine(context, cordinats);
   }
 
   // Temp
@@ -82,7 +95,7 @@ class TicTacToe {
     const filterTic = fractions.map(function(item) {
       let state = 0;
       if(item.state == 'tic') {
-        state == 1
+        state = 1
       }
       return state;
     });
@@ -90,29 +103,33 @@ class TicTacToe {
     const filterTac = fractions.map(function(item) {
       let state = 0;
       if(item.state == 'tac') {
-        state == 1
+        state = 1
       }
       return state;
     });
 
-    const compareArrays = function(arrayOne, arrayTwo) {
-      if(arrayOne.length === arrayTwo.length) {
-        for(let i = 0; i < arrayOne.length; i++) {
-          if(arrayOne[i] !== arrayTwo[i]) {
-            return false;
-          }
-        };
-      }
-      return false;
+    const compareArrays = function(arrayLeft, arrayRight) {
+      if(arrayLeft.length !== arrayRight.length) {
+    		return false;
+    	}
+    	for(let i = 0; arrayLeft.length > i; i++) {
+    		if(arrayLeft[i] !== arrayRight[i]) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
-    this.winCombinations.forEach(function(item) {
-      compareArrays(filterTic, item)
+    this.winCombinations.forEach((item) => {
+      this.win = compareArrays(filterTic, item);
     });
   }
 
   clickEvent(board, fractions, fraction) {
     board.addEventListener('click', (e) => {
+      if(this.win) {
+        return
+      }
       for(let item of fractions) {
         let maxPosX = item.posX + fraction;
         let maxPosY = item.posY + fraction;
