@@ -9,16 +9,6 @@ class TicTacToe {
     this.fractions = [];
     this.player = 1;
     this.win = false;
-    this.winCombinations = [
-      [1, 1, 1, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 1, 1],
-      [1, 0, 0, 1, 0, 0, 1, 0, 0],
-      [0, 1, 0, 0, 1, 0, 0, 1, 0],
-      [0, 0, 1, 0, 0, 1, 0, 0, 1],
-      [1, 0, 0, 0, 1, 0, 0, 0, 1],
-      [0, 0, 1, 0, 1, 0, 1, 0, 0],
-    ]
   }
 
   setBoardSize(board, size) {
@@ -45,7 +35,11 @@ class TicTacToe {
     }
   }
 
-  drawLine(context, cordinats, size) {
+  getFractionCenter(pos, size) {
+    return (pos + size) - (size / 2)
+  }
+
+  drawLine(context, cordinats) {
     context.beginPath();
     context.moveTo(cordinats.startX, cordinats.startY);
     context.lineTo(cordinats.finishX, cordinats.finishY);
@@ -56,8 +50,8 @@ class TicTacToe {
   }
 
   drawCircle(context, posX, posY, size) {
-    const centerX = (posX + size) - (size / 2);
-    const centerY = (posY + size) - (size / 2);
+    const centerX = this.getFractionCenter(posX, size);
+    const centerY = this.getFractionCenter(posY, size);
     context.beginPath();
     context.lineWidth = 10;
     context.strokeStyle = '#ff0000';
@@ -66,16 +60,23 @@ class TicTacToe {
   }
 
   drawCross(context, posX, posY, size) {
-
-    const cordinats = {
-      startX: posX + 20,
-      startY: posY + 20,
-      finishX: posX + size - 20,
-      finishY: posY + size - 20
+    const crossCordinats = {
+      lineOne: {
+        startX: posX + 20,
+        startY: posY + 20,
+        finishX: (posX + size) - 20,
+        finishY: (posY + size) - 20,
+      },
+      lineTwo: {
+        startX: (posX + size) - 20,
+        startY: posY + 20,
+        finishX: posX + 20,
+        finishY: (posY + size) - 20
+      }
     }
 
-    this.drawLine(context, cordinats);
-    this.drawLine(context, cordinats);
+    this.drawLine(context, crossCordinats.lineOne);
+    this.drawLine(context, crossCordinats.lineTwo);
   }
 
   // Temp
@@ -108,21 +109,30 @@ class TicTacToe {
       return state;
     });
 
-    const compareArrays = function(arrayLeft, arrayRight) {
-      if(arrayLeft.length !== arrayRight.length) {
-    		return false;
-    	}
-    	for(let i = 0; arrayLeft.length > i; i++) {
-    		if(arrayLeft[i] !== arrayRight[i]) {
-    			return false;
-    		}
-    	}
-    	return true;
-    }
 
-    this.winCombinations.forEach((item) => {
-      this.win = compareArrays(filterTic, item);
-    });
+
+
+    function checkHorizontal(array) {
+    	const result = array.reduce(function(previousValue, currentValue) {
+    		switch(true) {
+    			case currentValue === 1:
+    				return previousValue += 1;
+    			case previousValue >= 3:
+    				return previousValue;
+    			default:
+    				return 0;
+    		}
+    	}, 0);
+    	return result >= 3 ? true : false
+    };
+
+
+    /*
+    Compare all results
+    */
+    if(checkHorizontal(filterTic) || checkHorizontal(filterTac)) {
+      this.win = true
+    }
   }
 
   clickEvent(board, fractions, fraction) {
