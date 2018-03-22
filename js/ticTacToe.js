@@ -39,23 +39,25 @@ class TicTacToe {
     return (pos + size) - (size / 2)
   }
 
-  drawLine(context, cordinats) {
+  drawLine(context, cordinats, color = '#ff0000') {
     context.beginPath();
     context.moveTo(cordinats.startX, cordinats.startY);
-    context.lineTo(cordinats.finishX, cordinats.finishY);
-    context.lineWidth = 10;
+    context.lineWidth = 7;
     context.lineCap = 'round';
-    context.strokeStyle = '#ff0000';
+    context.strokeStyle = color;
+    context.lineTo(cordinats.finishX, cordinats.finishY);
     context.stroke();
   }
 
-  drawCircle(context, posX, posY, size) {
+  drawCircle(context, posX, posY, size, color = '#F385A2') {
     const centerX = this.getFractionCenter(posX, size);
     const centerY = this.getFractionCenter(posY, size);
+    const radius = ((centerX - posX)) * .65;
+    const lineWidth = radius / 5;
     context.beginPath();
-    context.lineWidth = 10;
-    context.strokeStyle = '#ff0000';
-    context.arc(centerX, centerY, 40, 0, 2 * Math.PI);
+    context.lineWidth = lineWidth;
+    context.strokeStyle = color;
+    context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     context.stroke();
   }
 
@@ -74,63 +76,85 @@ class TicTacToe {
         finishY: (posY + size) - 20
       }
     }
-
-    this.drawLine(context, crossCordinats.lineOne);
-    this.drawLine(context, crossCordinats.lineTwo);
+    this.drawLine(context, crossCordinats.lineOne, '#666A6D');
+    this.drawLine(context, crossCordinats.lineTwo, '#666A6D');
   }
 
-  // Temp
-  drawFraction(context, posX, posY, size, color = 'black') {
+  drawBoard(context, color = '#A6D9D2') {
     context.fillStyle = color;
-    context.fillRect(posX, posY, size, size);
+    context.fillRect(0, 0, this.size, this.size);
   }
 
-  drawFractions(context, fractions) {
-    fractions.forEach((item) => {
-      context.fillRect(item.posX, item.posY, this.fraction, this.fraction);
-    })
+  drawLines(context, size, cells) {
+    const fraction = size / cells;
+    const verticalLines = [];
+    const horizontalLines = [];
+    for(let i = 1; cells > i; i++) {
+      verticalLines.push({
+        startX: 0,
+        startY: fraction * i,
+        finishX: size,
+        finishY: fraction * i
+      });
+      horizontalLines.push({
+        startX: fraction * i,
+        startY: 0,
+        finishX: fraction * i,
+        finishY: size
+      })
+    }
+    verticalLines.forEach(item => {
+      console.log(item)
+      this.drawLine(context, item, 'white');
+    });
+    horizontalLines.forEach(item => {
+      this.drawLine(context, item, 'white');
+    });
   }
+
+  // drawFractions(context, fractions) {
+  //   fractions.forEach((item) => {
+  //     context.fillRect(item.posX, item.posY, this.fraction, this.fraction);
+  //   })
+  // }
 
   checkResults(fractions) {
 
-    const filterTic = fractions.map(function(item) {
-      let state = 0;
-      if(item.state == 'tic') {
-        state = 1
-      }
-      return state;
-    });
+    const filterTic = fractions.map((item) => (item.state == 'tic' ? 1 : 0));
+    const filterTac = fractions.map((item) => (item.state == 'tac' ? 1 : 0));
 
-    const filterTac = fractions.map(function(item) {
-      let state = 0;
-      if(item.state == 'tac') {
-        state = 1
-      }
-      return state;
-    });
-
-
-
-
-    function checkHorizontal(array) {
-    	const result = array.reduce(function(previousValue, currentValue) {
+    const checkHorizontal = (array) => {
+    	const result = array.reduce((previousValue, currentValue) => {
     		switch(true) {
     			case currentValue === 1:
     				return previousValue += 1;
-    			case previousValue >= 3:
+    			case previousValue >= this.cells:
     				return previousValue;
     			default:
     				return 0;
     		}
     	}, 0);
-    	return result >= 3 ? true : false
+    	return result >= this.cells ? true : false
     };
+
+    const checkVertical = (array) => {
+    	const temp = [];
+    	for(let i = 0; this.cells > i; i++) {
+    		for(let j = i; array.length > j; j += this.cells) {
+    			temp.push(array[j])
+    		}
+    	}
+    	return checkHorizontal(temp);
+    }
 
 
     /*
     Compare all results
     */
     if(checkHorizontal(filterTic) || checkHorizontal(filterTac)) {
+      this.win = true
+    }
+    if(checkVertical(filterTic) || checkVertical(filterTac)) {
       this.win = true
     }
   }
@@ -167,7 +191,9 @@ class TicTacToe {
   init() {
     this.setBoardSize(this.board, this.size);
     this.setFractions(this.size, this.cells, this.fraction);
-    this.drawFractions(this.context, this.fractions, this.size, this.cells);
+    this.drawBoard(this.context);
+    this.drawLines(this.context, this.size, this.cells);
+    //this.drawFractions(this.context, this.fractions, this.size, this.cells);
     this.clickEvent(this.board, this.fractions, this.fraction);
   }
 
