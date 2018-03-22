@@ -147,6 +147,21 @@ class TicTacToe {
     	return checkHorizontal(temp);
     }
 
+    const checkCross = (array) => {
+      const crossX = [];
+    	const crossY = [];
+    	for(let i = 0; this.cells > i; i++) {
+    		for(let j = i; array.length > j; j += this.cells) {
+    			crossX.push(array[j - i])
+    			crossY.push(array[j + i])
+    		}
+    	}
+      console.clear();
+      console.log(array)
+      console.log(crossX)
+    	return checkVertical(crossX) || checkVertical(crossY)
+    }
+
 
     /*
     Compare all results
@@ -155,6 +170,9 @@ class TicTacToe {
       this.win = true
     }
     if(checkVertical(filterTic) || checkVertical(filterTac)) {
+      this.win = true
+    }
+    if(checkCross(filterTic) || checkCross(filterTac)) {
       this.win = true
     }
   }
